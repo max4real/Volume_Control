@@ -87,7 +87,7 @@ class VolumeControlController extends GetxController {
       volumeLevel.value = newVolume.toString();
       final volume = double.tryParse(volumeLevel.value) ?? 0;
       int intValue = volume.toInt();
-      if (intValue % 10 == 0) {
+      if (intValue % 20 == 0) {
         HapticFeedback.vibrate();
       }
       setMediaVolumeLevel(intValue);

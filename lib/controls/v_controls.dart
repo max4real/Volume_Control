@@ -105,7 +105,7 @@ class VolumeControlPage extends StatelessWidget {
                   visibility: NotificationVisibility.visibilityPublic,
                   positionGravity: PositionGravity.auto,
                   alignment: OverlayAlignment.centerRight,
-                  height: 250,
+                  height: 300,
                   width: 80,
                   startPosition: const OverlayPosition(0, -259),
                 );
