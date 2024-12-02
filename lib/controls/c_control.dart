@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 
 class VolumeControlController extends GetxController {
@@ -13,25 +14,50 @@ class VolumeControlController extends GetxController {
   void onInit() {
     // TODO: implement onInit
     super.onInit();
-    // FlutterOverlayWindow.overlayListener.listen((event) {
-    //   print("1");
-    //   if (event == "volumeUp") {
-    //     print("Volume Up received");
-    //     volumeUp();
-    //   } else if (event == "volumeDown") {
-    //     print("Volume Down received");
-    //     volumeDown();
-    //   }
-    // });
-    _getMaxVolume();
+    initLoad();
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    // FlutterOverlayWindow.disposeOverlayListener();
   }
+
+  void initLoad() async {
+    if (await FlutterOverlayWindow.isActive()) return;
+    await FlutterOverlayWindow.showOverlay(
+      enableDrag: true,
+      flag: OverlayFlag.defaultFlag,
+      visibility: NotificationVisibility.visibilityPublic,
+      positionGravity: PositionGravity.auto,
+      alignment: OverlayAlignment.centerRight,
+      height: 300,
+      width: 80,
+      startPosition: const OverlayPosition(0, -259),
+    );
+
+    FlutterOverlayWindow.overlayListener.listen((event) {
+      print(event);
+      if (event != null) {
+        print("Event received: $event");
+        switch (event) {
+          case "volumeUp":
+            print("Volume Up triggered");
+            volumeUp();
+            break;
+          case "volumeDown":
+            print("Volume Down triggered");
+            volumeDown();
+            break;
+          default:
+            print("Unknown event: $event");
+        }
+      } else {
+        print("No event received");
+      }
+    });
+  }
+
 
   Future<void> _getMaxVolume() async {
     try {
@@ -92,5 +118,9 @@ class VolumeControlController extends GetxController {
       }
       setMediaVolumeLevel(intValue);
     }
+  }
+
+  void test() {
+    print("Yee Haww");
   }
 }

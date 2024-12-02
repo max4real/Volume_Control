@@ -9,7 +9,7 @@ class VolumeControlPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    VolumeControlController controller = Get.put(VolumeControlController());
+    VolumeControlController controller = Get.find();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Volume Control UI with Swipe'),
