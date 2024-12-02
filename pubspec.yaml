@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_overlay_window: ^0.4.5
+  font_awesome_flutter: ^10.8.0
   get:
 
 dev_dependencies:

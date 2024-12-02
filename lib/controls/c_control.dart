@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 
 class VolumeControlController extends GetxController {
@@ -13,12 +14,23 @@ class VolumeControlController extends GetxController {
   void onInit() {
     // TODO: implement onInit
     super.onInit();
+    FlutterOverlayWindow.overlayListener.listen((event) {
+      print("1");
+      if (event == "volumeUp") {
+        print("Volume Up received");
+        volumeUp();
+      } else if (event == "volumeDown") {
+        print("Volume Down received");
+        volumeDown();
+      }
+    });
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
+    FlutterOverlayWindow.disposeOverlayListener();
   }
 
   Future<void> _getMediaVolumeLevel() async {
