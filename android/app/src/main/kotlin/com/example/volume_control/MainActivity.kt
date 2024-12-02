@@ -2,8 +2,6 @@ package com.example.volume_control
 
 import android.content.Context
 import android.media.AudioManager
-import android.os.BatteryManager
-import android.os.Build
 import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -18,15 +16,37 @@ class MainActivity : FlutterActivity() {
 
         // Media Volume Level Method Channel
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, MEDIA_CHANNEL).setMethodCallHandler { call, result ->
-            if (call.method == "getMediaVolumeLevel") {
-                val mediaVolumeLevel = getMediaVolumeLevel()
-                if (mediaVolumeLevel != -1) {
-                    result.success(mediaVolumeLevel)
-                } else {
-                    result.error("UNAVAILABLE", "Media volume level not available.", null)
+            when (call.method) {
+                "getMediaVolumeLevel" -> {
+                    val mediaVolumeLevel = getMediaVolumeLevel()
+                    if (mediaVolumeLevel != -1) {
+                        result.success(mediaVolumeLevel)
+                    } else {
+                        result.error("UNAVAILABLE", "Media volume level not available.", null)
+                    }
                 }
-            } else {
-                result.notImplemented()
+                "setMediaVolumeLevel" -> {
+                    val percentage = call.argument<Int>("percentage") ?: -1
+                    if (percentage in 0..100) {
+                        val success = setVolumeToPercentage(percentage)
+                        if (success) {
+                            result.success("Volume set to $percentage%.")
+                        } else {
+                            result.error("FAILED", "Unable to set volume to $percentage%.", null)
+                        }
+                    } else {
+                        result.error("INVALID_ARGUMENT", "Percentage must be between 0 and 100.", null)
+                    }
+                }
+                "getMaxVolume" -> {
+                    val maxVolume = getMaxVolume(AudioManager.STREAM_MUSIC)
+                    if (maxVolume > 0) {
+                        result.success(maxVolume)
+                    } else {
+                        result.error("UNAVAILABLE", "Max volume not available.", null)
+                    }
+                }
+                else -> result.notImplemented()
             }
         }
 
@@ -54,32 +74,36 @@ class MainActivity : FlutterActivity() {
         }
     }
 
+    /**
+     * Gets the maximum volume level for the specified audio stream.
+     */
+    private fun getMaxVolume(streamType: Int): Int {
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        return audioManager.getStreamMaxVolume(streamType)
+    }
+
+    /**
+     * Gets the current media volume level as a percentage (0-100).
+     */
     private fun getMediaVolumeLevel(): Int {
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-
-        var maxVolume: Int
-        var currentVolume: Int
-
-        // Try to get the volume for STREAM_MUSIC (media)
-        try {
-            maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-            currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+        return try {
+            val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+            val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+            if (maxVolume > 0) {
+                (currentVolume * 100) / maxVolume
+            } else {
+                -1 // Error case
+            }
         } catch (e: Exception) {
-            // In case STREAM_MUSIC is not available, fallback to STREAM_RING or another stream
-            maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_RING)
-            currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_RING)
-        }
-
-        return if (maxVolume > 0) {
-            (currentVolume * 100) / maxVolume 
-        } else {
-            -1 
+            e.printStackTrace()
+            -1 // Error case
         }
     }
 
-
-    
-    // Method to adjust volume up or down
+    /**
+     * Adjusts the volume up or down by one step.
+     */
     private fun adjustVolume(up: Boolean): Boolean {
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         return try {
@@ -88,6 +112,22 @@ class MainActivity : FlutterActivity() {
             } else {
                 audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND)
             }
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    /**
+     * Sets the media volume to a specific percentage (0-100).
+     */
+    private fun setVolumeToPercentage(percentage: Int): Boolean {
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        return try {
+            val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+            val targetVolume = (percentage / 100.0 * maxVolume).toInt()
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, targetVolume, AudioManager.FLAG_PLAY_SOUND)
             true
         } catch (e: Exception) {
             e.printStackTrace()

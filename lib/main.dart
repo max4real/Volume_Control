@@ -28,7 +28,7 @@ void overlayMain() {
               IconButton(
                 onPressed: () async {
                   // await FlutterOverlayWindow.shareData("volumeUp");
-                  print("Sharing data: volumeUp");
+                  print("Sharing data: volumeDown");
                 },
                 icon: const FaIcon(
                   FontAwesomeIcons.volumeHigh,

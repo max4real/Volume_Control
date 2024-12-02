@@ -31,7 +31,6 @@ class VolumeControlPage extends StatelessWidget {
             ),
             GestureDetector(
               onVerticalDragUpdate: (details) {
-                // HapticFeedback.lightImpact();
                 controller.listenSwipe(details);
               },
               child: Container(
@@ -42,26 +41,33 @@ class VolumeControlPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: ValueListenableBuilder(
-                    valueListenable: controller.volumeLevel,
-                    builder: (context, volumeLevel, child) {
-                      final volume = double.tryParse(volumeLevel) ?? 0;
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        width: 35,
-                        height: volume,
-                        decoration: const BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(8),
-                            bottomRight: Radius.circular(8),
+                    alignment: Alignment.bottomCenter,
+                    child: ValueListenableBuilder(
+                      valueListenable: controller.volumeLevel,
+                      builder: (context, volumeLevel, child) {
+                        final volume = double.tryParse(volumeLevel) ?? 0;
+                        bool isHighVolume = volume > 95;
+                        bool isLowVolume = volume < 5;
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: isLowVolume ? (volume / 10) + 25 : 35,
+                          height: volume,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1A1A1A),
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: const Radius.circular(8),
+                              bottomRight: const Radius.circular(8),
+                              topLeft: isHighVolume
+                                  ? const Radius.circular(8)
+                                  : Radius.zero,
+                              topRight: isHighVolume
+                                  ? const Radius.circular(8)
+                                  : Radius.zero,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                        );
+                      },
+                    )),
               ),
             ),
             IconButton(
