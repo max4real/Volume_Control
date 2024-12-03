@@ -8,7 +8,28 @@ import 'package:get/get.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  Get.put(VolumeControlController());
+  // final controller =
+   Get.put(VolumeControlController());
+  // FlutterOverlayWindow.overlayListener.listen((event) {
+  //     print(event);
+  //     if (event != null) {
+  //       // print("Event received: $event");
+  //       switch (event) {
+  //         case "volumeUp":
+  //           // print("Volume Up triggered");
+  //           controller.volumeUp();
+  //           break;
+  //         case "volumeDown":
+  //           // print("Volume Down triggered");
+  //           controller.volumeDown();
+  //           break;
+  //         default:
+  //           // print("Unknown event: $event");
+  //       }
+  //     } else {
+  //       print("No event received");
+  //     }
+  //   });
   runApp(const MainApp());
 }
 
@@ -16,7 +37,12 @@ void main() {
 @pragma("vm:entry-point")
 void overlayMain() {
   WidgetsFlutterBinding.ensureInitialized();
-  Get.put(VolumeControlController());
+  VolumeControlController controller = Get.put(VolumeControlController());
+
+  FlutterOverlayWindow.overlayListener.listen((e) {
+    print('overlay---: $e');
+    controller.volumeUp();
+  });
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -30,7 +56,6 @@ class OverlayPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // VolumeControlController controller = Get.find();
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(

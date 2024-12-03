@@ -52,6 +52,7 @@ class MainActivity : FlutterActivity() {
 
         // Volume Control Method Channel
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, VOLUME_CHANNEL).setMethodCallHandler { call, result ->
+        print(call.method)
             when (call.method) {
                 "volumeUp" -> {
                     val success = adjustVolume(up = true)

@@ -4,12 +4,63 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:volume_control/controls/c_control.dart';
 import 'package:get/get.dart';
 
-class VolumeControlPage extends StatelessWidget {
+class VolumeControlPage extends StatefulWidget {
   const VolumeControlPage({super.key});
 
   @override
+  State<VolumeControlPage> createState() => _VolumeControlPageState();
+}
+
+class _VolumeControlPageState extends State<VolumeControlPage> {
+  VolumeControlController controller = Get.find();
+  @override
+  void initState() {
+    initLoad();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    FlutterOverlayWindow.closeOverlay();
+    super.dispose();
+  }
+
+  void initLoad() async {
+    // if (await FlutterOverlayWindow.isActive()) return;
+    // await FlutterOverlayWindow.showOverlay(
+    //   enableDrag: true,
+    //   flag: OverlayFlag.defaultFlag,
+    //   visibility: NotificationVisibility.visibilityPublic,
+    //   positionGravity: PositionGravity.auto,
+    //   alignment: OverlayAlignment.centerRight,
+    //   height: 300,
+    //   width: 80,
+    //   startPosition: const OverlayPosition(0, -259),
+    // );
+    // print('done init');
+    // FlutterOverlayWindow.overlayListener.listen((event) {
+    //   print(event);
+    //   if (event != null) {
+    //     // print("Event received: $event");
+    //     switch (event) {
+    //       case "volumeUp":
+    //         // print("Volume Up triggered");
+    //         controller.volumeUp();
+    //         break;
+    //       case "volumeDown":
+    //         // print("Volume Down triggered");
+    //         controller.volumeDown();
+    //         break;
+    //       default:
+    //         // print("Unknown event: $event");
+    //     }
+    //   } else {
+    //     print("No event received");
+    //   }
+    // });
+  }
+  @override
   Widget build(BuildContext context) {
-    VolumeControlController controller = Get.find();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Volume Control UI with Swipe'),
@@ -99,6 +150,7 @@ class VolumeControlPage extends StatelessWidget {
             ElevatedButton(
               onPressed: () async {
                 if (await FlutterOverlayWindow.isActive()) return;
+
                 await FlutterOverlayWindow.showOverlay(
                   enableDrag: true,
                   flag: OverlayFlag.defaultFlag,
@@ -114,9 +166,17 @@ class VolumeControlPage extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
+                // FlutterOverlayWindow.shareData('hello');
                 FlutterOverlayWindow.closeOverlay();
+                FlutterOverlayWindow.disposeOverlayListener();
               },
               child: const Text("Close Overlay"),
+            ),
+            TextButton(
+              onPressed: () {
+                FlutterOverlayWindow.shareData('hello');
+              },
+              child: const Text("send"),
             ),
           ],
         ),
